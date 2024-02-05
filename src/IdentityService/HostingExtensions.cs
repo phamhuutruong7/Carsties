@@ -1,6 +1,7 @@
 using Duende.IdentityServer;
 using IdentityService.Data;
 using IdentityService.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -27,6 +28,7 @@ internal static class HostingExtensions
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+                //options.Authentication.CookieAuthenticationScheme = "cookies";
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 // options.EmitStaticAudienceClaim = true;
@@ -34,9 +36,17 @@ internal static class HostingExtensions
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScopes)
             .AddInMemoryClients(Config.Clients)
-            .AddAspNetIdentity<ApplicationUser>();
-        
-        builder.Services.AddAuthentication();
+            .AddAspNetIdentity<ApplicationUser>()
+            .AddProfileService<CustomProfileService>()
+            ;
+
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+
+        builder.Services.AddAuthentication(defaultScheme: "cookies")
+            .AddCookie("cookies", options => { });
 
         return builder.Build();
     }
@@ -49,9 +59,10 @@ internal static class HostingExtensions
         {
             app.UseDeveloperExceptionPage();
         }
-
+        
         app.UseStaticFiles();
         app.UseRouting();
+        
         app.UseIdentityServer();
         app.UseAuthorization();
         
