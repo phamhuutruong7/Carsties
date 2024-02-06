@@ -43,11 +43,20 @@ internal static class HostingExtensions
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.SameSite = SameSiteMode.Lax;
+            //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         });
 
         builder.Services.AddAuthentication(defaultScheme: "cookies")
             .AddCookie("cookies", options => { });
-
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
         return builder.Build();
     }
     
@@ -59,11 +68,17 @@ internal static class HostingExtensions
         {
             app.UseDeveloperExceptionPage();
         }
-        
+
         app.UseStaticFiles();
         app.UseRouting();
         
         app.UseIdentityServer();
+        app.UseCors(options =>
+        {
+            options.AllowAnyOrigin();
+            options.AllowAnyMethod();
+            options.AllowAnyHeader();
+        });
         app.UseAuthorization();
         
         app.MapRazorPages()

@@ -1,4 +1,5 @@
 ﻿using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace IdentityService;
 
