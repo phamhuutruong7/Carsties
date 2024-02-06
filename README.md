@@ -3,4 +3,4 @@ Origin from Udemy course: Build a microservices app with .NET and NextJS from sc
 Author: Neil Cummings.
 
 
-The Password for all user in this project must be Pass123$
+The Password for all users in this project must be Pass123$
